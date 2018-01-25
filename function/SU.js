@@ -15,7 +15,7 @@ module.exports.SU = (device, ID) => {
 
             console.log(iot_data);
 
-            closeAndExec();    
+            closeTCP();    
 
             device.publish('robot_topic', JSON.stringify({id: ID, datetime: new Date(Date.now()).toString(), data: iot_data}));
         });
@@ -23,7 +23,6 @@ module.exports.SU = (device, ID) => {
 
     client.on('error', (err) => {
         console.log("Error: "+err.message);
-        step = 0;
     });
 }
 
@@ -40,7 +39,7 @@ function dataToJSONFormat(data) {
     return data_json;
 }
 
-function closeAndExec() {
+function closeTCP() {
     client.write("OK");
                     
     client.destroy();

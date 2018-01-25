@@ -6,6 +6,7 @@
   "dependencies": {
     "aws-iot-device-sdk": "^2.2.0",
     "colors": "^1.1.2",
+    "dotenv": "^4.0.0",
     "net": "^1.0.2",
     "redis": "^2.8.0"
   },
