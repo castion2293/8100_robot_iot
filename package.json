@@ -1,0 +1,17 @@
+{
+  "name": "8100_robot_iot",
+  "version": "1.0.0",
+  "description": "uc8100 iot gateway source code in node.js",
+  "main": "index.js",
+  "dependencies": {
+    "aws-iot-device-sdk": "^2.2.0",
+    "colors": "^1.1.2",
+    "net": "^1.0.2",
+    "redis": "^2.8.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "castion2293",
+  "license": "ISC"
+}
