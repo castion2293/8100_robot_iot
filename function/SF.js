@@ -12,7 +12,7 @@ let client = null;
 
 module.exports.SF = (device, ID) => {
     client = new net.Socket();
-
+    
     client.connect(PORT, HOST, () => {
         console.log("TCP Connection opened successfully!".green);
 
