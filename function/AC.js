@@ -13,7 +13,9 @@ let client = null;
 module.exports.AC = (device, ID) => {
 
     cache.get("alarm_flag", function (err, reply) {
-        if (reply) {
+        console.log(Boolean(reply));
+
+        if (Boolean(reply)) {
             client = new net.Socket();
 
             client.connect(PORT, HOST, () => {

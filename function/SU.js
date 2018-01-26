@@ -17,7 +17,7 @@ module.exports.SU = (device, ID) => {
 
             closeTCP();    
 
-            // device.publish('robot_topic', JSON.stringify({id: ID, datetime: new Date(Date.now()).toString(), data: iot_data}));
+            //device.publish('robot_topic', JSON.stringify({id: ID, datetime: new Date(Date.now()).toString(), data: iot_data}));
         });
     });
 

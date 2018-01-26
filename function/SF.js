@@ -12,7 +12,7 @@ let client = null;
 
 module.exports.SF = (device, ID) => {
     client = new net.Socket();
-    
+
     client.connect(PORT, HOST, () => {
         console.log("TCP Connection opened successfully!".green);
 
@@ -34,7 +34,7 @@ module.exports.SF = (device, ID) => {
             if (alarm_flag == 1) {
                 cache.set("alarm_flag", true)
             } else {
-                cache.set("alarm_flag", false)
+                cache.set("alarm_flag", "")
             }
         });
     });
