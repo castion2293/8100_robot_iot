@@ -13,7 +13,7 @@ let client = null;
 module.exports.AC = (device, ID) => {
 
     cache.get("alarm_flag", function (err, reply) {
-        console.log(Boolean(reply));
+        //console.log(Boolean(reply));
 
         if (Boolean(reply)) {
             client = new net.Socket();
@@ -58,6 +58,7 @@ function dataToJSONFormat(data) {
         let alarm_date = alarm_datatime_array[0];
         let alarm_time = alarm_datatime_array[1];
 
+        // ignore 008-017 Safety SW On alarm
         if (alarm_code == '008-017') {
             data_json['ALARM_NUM']--;
             continue;
