@@ -23,3 +23,9 @@ module.exports.device = awsIot.device({
 
 // serial Number
 module.exports.ID = process.env.ID;
+
+// redis cache settings
+module.exports.redis = require("redis");
+
+// UUID
+module.exports.uuidV1 = require('uuid/v1');

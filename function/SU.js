@@ -1,4 +1,10 @@
-const { net, HOST, PORT } = require('../bootstrap');
+const { net, HOST, PORT, redis } = require('../bootstrap');
+
+cache = redis.createClient();
+
+cache.on("error", function (err) {
+    console.log("Error " + err);
+});
 
 let client = null;
 
@@ -17,7 +23,7 @@ module.exports.SU = (device, ID) => {
 
             closeTCP();    
 
-            device.publish('status_topic', JSON.stringify({id: ID, datetime: new Date(Date.now()).toString(), data: iot_data}));
+            device.publish('Robot/status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
         });
     });
 

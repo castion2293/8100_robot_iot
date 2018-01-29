@@ -1,7 +1,5 @@
-const { net, HOST, PORT } = require('../bootstrap');
+const { net, HOST, PORT, redis } = require('../bootstrap');
 
-// redis cache settings
-var redis = require("redis");
 cache = redis.createClient();
 
 cache.on("error", function (err) {
@@ -26,7 +24,7 @@ module.exports.SF = (device, ID) => {
 
             let iot_data = dataToJSONFormat(data);
 
-            device.publish('total_status_topic', JSON.stringify({id: ID, datetime: new Date(Date.now()).toString(), data: iot_data}));
+            device.publish('Robot/total_status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
         });
     });
 
@@ -86,16 +84,16 @@ function findALarm (byte) {
 
 function findServo (byte) {
     if (parseInt(byte) == 1) {
-        return "ON";
+        return Boolean(true);
     } 
-    return "OFF";
+    return Boolean(false);
 }
 
 function findEmg (byte) {
     if (parseInt(byte) == 1) {
-        return "ON";
+        return Boolean(true);
     } 
-    return "OFF";
+    return Boolean(false);
 }
 
 function twoByteToDec (...byte) {
@@ -131,7 +129,15 @@ function toHEXArray (...byte) {
     let array1 = dec2bin(byte[0]).split('').reverse();
     let array2 = dec2bin(byte[1]).split('').reverse();
 
-    return array2.concat(array1);
+    let array_string =  array2.concat(array1);
+
+    return array_string.map(e => {
+        if (e == 1) {
+            return Boolean(true);
+        }
+
+        return Boolean(false);
+    });
 }
 
 function closeTCP() {

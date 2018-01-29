@@ -1,7 +1,5 @@
-const { net, HOST, PORT } = require('../bootstrap');
+const { net, HOST, PORT, redis, uuidV1 } = require('../bootstrap');
 
-// redis cache settings
-var redis = require("redis");
 cache = redis.createClient();
 
 cache.on("error", function (err) {
@@ -31,7 +29,7 @@ module.exports.AC = (device, ID) => {
                     closeTCP(); 
 
                     if (iot_data.ALARM_NUM > 0) {
-                        device.publish('robot_alarm', JSON.stringify({ id: ID, datetime: new Date(Date.now()).toString(), data: iot_data }));
+                        device.publish('Robot/alarm', JSON.stringify({ ID: uuidV1(), ROBOT_ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data }));
                     } 
                 });
             });
