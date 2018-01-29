@@ -24,7 +24,14 @@ module.exports.SF = (device, ID) => {
 
             let iot_data = dataToJSONFormat(data);
 
-            device.publish('Robot/total_status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
+            // check is it as same as last iot data, if not, publish the data to cloud
+            cache.get("total_status_data", (err, reply) => {
+                if (JSON.stringify(iot_data) != reply) {
+                    device.publish('Robot/total_status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
+                    cache.set("total_status_data", JSON.stringify(iot_data));
+                    console.log("Publishing Data...")
+                }
+            });
         });
     });
 

@@ -10,7 +10,7 @@ let client = null;
 
 module.exports.AC = (device, ID) => {
 
-    cache.get("alarm_flag", function (err, reply) {
+    cache.get("alarm_flag", (err, reply) => {
         //console.log(Boolean(reply));
 
         if (Boolean(reply)) {
@@ -22,14 +22,27 @@ module.exports.AC = (device, ID) => {
                 client.write("AC\r");
 
                 client.on("data", data => {
+
+                    closeTCP(); 
+
                     let iot_data = dataToJSONFormat(data);
                     
                     console.log(iot_data);
 
-                    closeTCP(); 
-
                     if (iot_data.ALARM_NUM > 0) {
-                        device.publish('Robot/alarm', JSON.stringify({ ID: uuidV1(), ROBOT_ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data }));
+
+                        cache.get('alarm_send', (err, reply) => {
+                            console.log(reply);
+
+                            if (!Boolean(reply)) {
+                                cache.set('alarm_send', Boolean(true));
+                                cache.expire('alarm_send', 60);
+                                
+                                device.publish('Robot/alarm', JSON.stringify({ ID: uuidV1(), ROBOT_ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data }));
+                            } else {
+                                console.log("wait 60 sec");
+                            }
+                        });
                     } 
                 });
             });

@@ -17,13 +17,19 @@ module.exports.SU = (device, ID) => {
         client.write("SU\r");
 
         client.on("data", data => {
+
+            closeTCP(); 
+            
             let iot_data = dataToJSONFormat(data);
 
-            console.log(iot_data);
-
-            closeTCP();    
-
-            device.publish('Robot/status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
+            // check is it as same as last iot data, if not, publish the data to cloud
+            cache.get("status_data", (err, reply) => {
+                if (JSON.stringify(iot_data) != reply) {
+                    device.publish('Robot/status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
+                    cache.set("status_data", JSON.stringify(iot_data));
+                    console.log("Publishing Data...".yellow);
+                }
+            });
         });
     });
 
