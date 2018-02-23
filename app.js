@@ -16,7 +16,7 @@ function exec () {
     switch (step) {
         case 0:
             console.log("step 0");
-        
+            
             step = 1;
             setTimeout(() => {
                 exec();
@@ -24,7 +24,7 @@ function exec () {
             break
         case 1:
             console.log("step 1");
-
+            
             SF(device, ID);
             
             step = 2;
