@@ -29,7 +29,18 @@ module.exports.SF = (device, ID) => {
                 if (JSON.stringify(iot_data) != reply) {
                     device.publish('Robot/total_status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
                     cache.set("total_status_data", JSON.stringify(iot_data));
-                    console.log("Publishing Data...")
+                    console.log("Publishing Total Status Data...")
+                }
+            });
+
+            let iot_coordinate_data = dataToCoordinateJSONFormat(data);
+
+            // check is it as same as last iot data, if not, publish the data to cloud
+            cache.get("coordinate_data", (err, reply) => {
+                if (JSON.stringify(iot_coordinate_data) != reply) {
+                    device.publish('Robot/coordinate_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_coordinate_data}));
+                    cache.set("coordinate_data", JSON.stringify(iot_coordinate_data));
+                    console.log("Publishing Coordinate Data...")
                 }
             });
         });
@@ -159,5 +170,43 @@ function dec2bin(n){
         throw new Error(n + " does not fit in a byte");
     }
     return ("000000000" + n.toString(2)).substr(-8)
+}
+
+function dataToCoordinateJSONFormat(data) {
+    let coordinate = findCoordiateData(data);
+
+    let data_json = {}
+
+    data_json['JOINT'] = coordinate.splice(0, 8);
+    data_json['WORLD'] = coordinate.splice(0, 8);
+    data_json['WORK'] = coordinate
+
+    return data_json;
+}
+
+function findCoordiateData(data) {
+    var buf = new ArrayBuffer(4); // Create a buffer
+    var view = new DataView(buf); // Create a data view of it
+    let cor = [];
+
+    for (let i = 119; i <= 214; i = i + 4) {
+        let dataSet =  [data[i], data[i + 1], data[i + 2], data[i + 3]];
+
+        // set bytes
+        dataSet.forEach(function (b, i) {
+            view.setUint8(i, b);
+        });
+
+        // Read the bits as a float; note that by doing this, we're implicitly
+        // converting it from a 32-bit float into JavaScript's native 64-bit double
+        cor.push(precisionRound(view.getFloat32(0), 3));
+    }
+
+    return cor;
+}
+
+function precisionRound(number, precision) {
+    var factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
 }
 

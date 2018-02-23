@@ -27,7 +27,7 @@ module.exports.SU = (device, ID) => {
                 if (JSON.stringify(iot_data) != reply) {
                     device.publish('Robot/status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
                     cache.set("status_data", JSON.stringify(iot_data));
-                    console.log("Publishing Data...".yellow);
+                    console.log("Publishing Status Data...".yellow);
                 }
             });
         });
