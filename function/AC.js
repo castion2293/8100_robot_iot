@@ -8,22 +8,27 @@ cache.on("error", function (err) {
 
 let client = null;
 
-module.exports.AC = (device, ID) => {
+module.exports.AC = (device, ID, data) => {
+    console.log("AC")
+   
+    // cache.get("alarm_flag", (err, reply) => {
+    //     //console.log(Boolean(reply));
 
-    cache.get("alarm_flag", (err, reply) => {
-        //console.log(Boolean(reply));
+    //     if (Boolean(reply)) {
+    //         //client = new net.Socket();
 
-        if (Boolean(reply)) {
-            client = new net.Socket();
+    //         // client.connect(PORT, HOST, () => {
+    //         //     console.log("TCP Connection opened successfully!".green);
 
-            client.connect(PORT, HOST, () => {
-                console.log("TCP Connection opened successfully!".green);
+    //             client.write("AC\r");
 
-                client.write("AC\r");
+    //             client.on("data", data => {
 
-                client.on("data", data => {
+    //                 // closeTCP(); 
 
-                    closeTCP(); 
+    //                 setTimeout(() => {
+    //                     client.write("OK\r");
+    //                 }, 50)
 
                     let iot_data = dataToJSONFormat(data);
                     
@@ -44,10 +49,10 @@ module.exports.AC = (device, ID) => {
                             }
                         });
                     } 
-                });
-            });
-        }
-    });
+    //             });
+    //         //});
+    //     }
+    // });
 }
 
 function dataToJSONFormat(data) {

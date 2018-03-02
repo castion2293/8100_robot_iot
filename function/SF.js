@@ -6,20 +6,27 @@ cache.on("error", function (err) {
     console.log("Error " + err);
 });
 
-let client = null;
+//let client = null;
 
-module.exports.SF = (device, ID) => {
-    client = new net.Socket();
+module.exports.SF = (device, ID, data) => {
+    //console.log("SF")
 
-    client.connect(PORT, HOST, () => {
-        console.log("TCP Connection opened successfully!".green);
+    //client = new net.Socket();
 
-        client.write("SF\r");
+    // client.connect(PORT, HOST, () => {
+    //     console.log("TCP Connection opened successfully!".green);
 
-        client.on("data", data => {
+        //client.write("SF\r");
 
-            closeTCP(); 
+        // client.on("data", data => {
+            
+        //     console.log("sf_data")
 
+        //     setTimeout(() => {
+        //         client.write("OK\r");
+        //     }, 50)
+
+        if (data[109] != "undefined" && data[109] != null) {
             findALarm(data[109]);
 
             let iot_data = dataToJSONFormat(data);
@@ -43,12 +50,16 @@ module.exports.SF = (device, ID) => {
                     console.log("Publishing Coordinate Data...")
                 }
             });
-        });
-    });
+        }
+        
 
-    client.on('error', (err) => {
-        console.log("Error: "+err.message);
-    });
+            //console.log('here');
+        //});
+    //});
+
+    // client.on('error', (err) => {
+    //     console.log("Error: "+err.message);
+    // });
 }
 
 function dataToJSONFormat(data) {
@@ -67,7 +78,7 @@ function dataToJSONFormat(data) {
     data_json['MASTER'] = findMaster(data[44]);
 
     data_json['DIN_1_16'] = toHEXArray(data[55], data[56]);
-    data_json['DIN_17_32'] = toHEXArray(data[55], data[56]);
+    data_json['DIN_17_32'] = toHEXArray(data[57], data[5]);
     data_json['DIN_33_48'] = toHEXArray(data[59], data[60]);
     data_json['DIN_49_64'] = toHEXArray(data[61], data[62]);
     data_json['DIN_101_116'] = toHEXArray(data[63], data[64]);

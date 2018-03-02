@@ -8,34 +8,41 @@ cache.on("error", function (err) {
 
 let client = null;
 
-module.exports.SU = (device, ID) => {
-    client = new net.Socket();
+module.exports.SU = (device, ID, data) => {
+    // console.log("SU");
+    
+    // client = new net.Socket();
 
-    client.connect(PORT, HOST, () => {
-        console.log("TCP Connection opened successfully!".green);
+    // client.connect(PORT, HOST, () => {
+    //     console.log("TCP Connection opened successfully!".green);
         
-        client.write("SU\r");
+        //client.write("SU\r");
 
-        client.on("data", data => {
+        // client.on("data", data => {
 
-            closeTCP(); 
+            //console.log(bin2string(data));
+            // console.log("su_data")
+
+            // setTimeout(() => {
+            //     client.write("OK\r");
+            // }, 50)
             
-            let iot_data = dataToJSONFormat(data);
+        let iot_data = dataToJSONFormat(data);
 
-            // check is it as same as last iot data, if not, publish the data to cloud
-            cache.get("status_data", (err, reply) => {
-                if (JSON.stringify(iot_data) != reply) {
-                    device.publish('Robot/status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
-                    cache.set("status_data", JSON.stringify(iot_data));
-                    console.log("Publishing Status Data...".yellow);
-                }
-            });
+        // check is it as same as last iot data, if not, publish the data to cloud
+        cache.get("status_data", (err, reply) => {
+            if (JSON.stringify(iot_data) != reply) {
+                device.publish('Robot/status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
+                cache.set("status_data", JSON.stringify(iot_data));
+                console.log("Publishing Status Data...".yellow);
+            }
         });
-    });
+        //});
+    //});
 
-    client.on('error', (err) => {
-        console.log("Error: "+err.message);
-    });
+    // client.on('error', (err) => {
+    //     console.log("Error: "+err.message);
+    // });
 }
 
 function dataToJSONFormat(data) {
