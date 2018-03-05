@@ -9,50 +9,25 @@ cache.on("error", function (err) {
 let client = null;
 
 module.exports.AC = (device, ID, data) => {
-    console.log("AC")
-   
-    // cache.get("alarm_flag", (err, reply) => {
-    //     //console.log(Boolean(reply));
+    let iot_data = dataToJSONFormat(data);
+    
+    console.log(iot_data);
 
-    //     if (Boolean(reply)) {
-    //         //client = new net.Socket();
+    if (iot_data.ALARM_NUM > 0) {
 
-    //         // client.connect(PORT, HOST, () => {
-    //         //     console.log("TCP Connection opened successfully!".green);
+        cache.get('alarm_send', (err, reply) => {
+            console.log(reply);
 
-    //             client.write("AC\r");
-
-    //             client.on("data", data => {
-
-    //                 // closeTCP(); 
-
-    //                 setTimeout(() => {
-    //                     client.write("OK\r");
-    //                 }, 50)
-
-                    let iot_data = dataToJSONFormat(data);
-                    
-                    console.log(iot_data);
-
-                    if (iot_data.ALARM_NUM > 0) {
-
-                        cache.get('alarm_send', (err, reply) => {
-                            console.log(reply);
-
-                            if (!Boolean(reply)) {
-                                cache.set('alarm_send', Boolean(true));
-                                cache.expire('alarm_send', 60);
-                                
-                                device.publish('Robot/alarm', JSON.stringify({ ID: uuidV1(), ROBOT_ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data }));
-                            } else {
-                                console.log("wait 60 sec");
-                            }
-                        });
-                    } 
-    //             });
-    //         //});
-    //     }
-    // });
+            if (!Boolean(reply)) {
+                cache.set('alarm_send', Boolean(true));
+                cache.expire('alarm_send', 60);
+                
+                device.publish('Robot/alarm', JSON.stringify({ ID: uuidV1(), ROBOT_ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data }));
+            } else {
+                console.log("wait 60 sec");
+            }
+        });
+    } 
 }
 
 function dataToJSONFormat(data) {
@@ -63,16 +38,30 @@ function dataToJSONFormat(data) {
     data_array.pop();
 
     let data_json = { ALARM: []};
-   
+    
     data_json['ALARM_NUM'] = alarm_num;
 
     for (i = 0; i < data_array.length; i = i + 3) {
         let alarm_code = data_array[i];
-        let alarm_name = data_array[i + 1];
-        
-        let alarm_datatime_array = data_array[i + 2].split(' ');
-        let alarm_date = alarm_datatime_array[0];
-        let alarm_time = alarm_datatime_array[1];
+        let alarm_name;
+        let alarm_datatime_array
+        let alarm_date;
+        let alarm_time;
+
+        if (Boolean(data_array[i + 1])) {
+            alarm_name = data_array[i + 1]
+        } else {
+            alarm_name = ''
+        }
+
+        if (Boolean(data_array[i + 2])) {
+            alarm_datatime_array = data_array[i + 2].split(' ');
+            alarm_date = alarm_datatime_array[0];
+            alarm_time = alarm_datatime_array[1];
+        } else {
+            alarm_date = '';
+            alarm_time = '';
+        }
 
         // ignore 008-017 Safety SW On alarm
         if (alarm_code == '008-017') {

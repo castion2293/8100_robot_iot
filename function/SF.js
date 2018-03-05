@@ -6,60 +6,32 @@ cache.on("error", function (err) {
     console.log("Error " + err);
 });
 
-//let client = null;
-
 module.exports.SF = (device, ID, data) => {
-    //console.log("SF")
+    if (data[109] != "undefined" && data[109] != null) {
+        findALarm(data[109]);
 
-    //client = new net.Socket();
+        let iot_data = dataToJSONFormat(data);
 
-    // client.connect(PORT, HOST, () => {
-    //     console.log("TCP Connection opened successfully!".green);
+        // check is it as same as last iot data, if not, publish the data to cloud
+        cache.get("total_status_data", (err, reply) => {
+            if (JSON.stringify(iot_data) != reply) {
+                device.publish('Robot/total_status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
+                cache.set("total_status_data", JSON.stringify(iot_data));
+                console.log("Publishing Total Status Data...")
+            }
+        });
 
-        //client.write("SF\r");
+        let iot_coordinate_data = dataToCoordinateJSONFormat(data);
 
-        // client.on("data", data => {
-            
-        //     console.log("sf_data")
-
-        //     setTimeout(() => {
-        //         client.write("OK\r");
-        //     }, 50)
-
-        if (data[109] != "undefined" && data[109] != null) {
-            findALarm(data[109]);
-
-            let iot_data = dataToJSONFormat(data);
-
-            // check is it as same as last iot data, if not, publish the data to cloud
-            cache.get("total_status_data", (err, reply) => {
-                if (JSON.stringify(iot_data) != reply) {
-                    device.publish('Robot/total_status_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_data}));
-                    cache.set("total_status_data", JSON.stringify(iot_data));
-                    console.log("Publishing Total Status Data...")
-                }
-            });
-
-            let iot_coordinate_data = dataToCoordinateJSONFormat(data);
-
-            // check is it as same as last iot data, if not, publish the data to cloud
-            cache.get("coordinate_data", (err, reply) => {
-                if (JSON.stringify(iot_coordinate_data) != reply) {
-                    device.publish('Robot/coordinate_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_coordinate_data}));
-                    cache.set("coordinate_data", JSON.stringify(iot_coordinate_data));
-                    console.log("Publishing Coordinate Data...")
-                }
-            });
-        }
-        
-
-            //console.log('here');
-        //});
-    //});
-
-    // client.on('error', (err) => {
-    //     console.log("Error: "+err.message);
-    // });
+        // check is it as same as last iot data, if not, publish the data to cloud
+        cache.get("coordinate_data", (err, reply) => {
+            if (JSON.stringify(iot_coordinate_data) != reply) {
+                device.publish('Robot/coordinate_topic', JSON.stringify({ID: parseInt(ID), DATETIME: new Date(Date.now()).toString(), data: iot_coordinate_data}));
+                cache.set("coordinate_data", JSON.stringify(iot_coordinate_data));
+                console.log("Publishing Coordinate Data...")
+            }
+        });
+    }
 }
 
 function dataToJSONFormat(data) {
@@ -78,7 +50,7 @@ function dataToJSONFormat(data) {
     data_json['MASTER'] = findMaster(data[44]);
 
     data_json['DIN_1_16'] = toHEXArray(data[55], data[56]);
-    data_json['DIN_17_32'] = toHEXArray(data[57], data[5]);
+    data_json['DIN_17_32'] = toHEXArray(data[57], data[58]);
     data_json['DIN_33_48'] = toHEXArray(data[59], data[60]);
     data_json['DIN_49_64'] = toHEXArray(data[61], data[62]);
     data_json['DIN_101_116'] = toHEXArray(data[63], data[64]);
